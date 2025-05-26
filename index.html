@@ -4,12 +4,49 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mengambil Koordinat Lokasi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 100%;
+      width: 100%;
+      border-radius: 0.5rem;
+    }
+  </style>
 </head>
-<body>
-  <h1>Koordinat Lokasi Anda</h1>
-  <p id="location">Memuat lokasi...</p>
-  <button onclick="getLocation()">Perbarui Lokasi</button>
-  <button onclick="showOnMap()">Show Map</button>
-  <script src="script.js"></script>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="container mx-auto p-4 max-w-lg">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <h1 class="text-2xl font-bold text-center text-gray-800 mb-4">Koordinat Lokasi Anda</h1>
+      <div id="location" class="text-gray-600 mb-4 text-center">
+        Klik tombol untuk mendapatkan lokasi...
+      </div>
+      <div id="error" class="text-red-500 mb-4 text-center hidden"></div>
+      <button onclick="getLocation()" 
+              class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">
+        Dapatkan Lokasi
+      </button>
+      <button onclick="openMapModal()" 
+              id="mapButton" 
+              class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg mt-2 transition duration-300 hidden">
+        Lihat di Peta
+      </button>
+    </div>
+  </div>
+
+  <div id="mapModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg p-4 w-full max-w-md sm:max-w-lg mx-4 h-96 sm:h-[500px] relative">
+      <button onclick="closeMapModal()" 
+              class="absolute top-2 right-2 text-gray-600 hover:text-gray-800">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <div id="map"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"> </script>
 </body>
 </html>

@@ -1,72 +1,84 @@
-// Fungsi untuk mengambil koordinat lokasi
-function getLocation() {
-  // Periksa apakah Geolocation didukung oleh browser
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      // Callback sukses
-      (position) => {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
-        const accuracy = position.coords.accuracy; // Akurasi dalam meter
+ let map, marker;
+    let currentLat, currentLng;
 
-        console.log(`Latitude: ${latitude}`);
-        console.log(`Longitude: ${longitude}`);
-        console.log(`Akurasi: ${accuracy} meter`);
+    function getLocation() {
+      const locationDiv = document.getElementById('location');
+      const errorDiv = document.getElementById('error');
+      const mapButton = document.getElementById('mapButton');
 
-        // Contoh: Tampilkan di halaman HTML
-        document.getElementById("location").innerHTML = 
-          `Latitude: ${latitude}, Longitude: ${longitude}, Akurasi: ${accuracy} meter`;
-      },
-      // Callback error
-      (error) => {
-        let errorMessage;
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = "Izin akses lokasi ditolak.";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = "Informasi lokasi tidak tersedia.";
-            break;
-          case error.TIMEOUT:
-            errorMessage = "Permintaan lokasi timeout.";
-            break;
-          default:
-            errorMessage = "Terjadi kesalahan: " + error.message;
-        }
-        console.error(errorMessage);
-        document.getElementById("location").innerHTML = errorMessage;
-      },
-      // Opsi untuk meningkatkan akurasi
-      {
-        enableHighAccuracy: true, // Aktifkan akurasi tinggi (GPS)
-        timeout: 10000, // Batas waktu 10 detik
-        maximumAge: 0 // Tidak menggunakan cache lokasi
+      locationDiv.innerHTML = 'Memuat lokasi...';
+      errorDiv.classList.add('hidden');
+      mapButton.classList.add('hidden');
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            currentLat = position.coords.latitude;
+            currentLng = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+
+            locationDiv.innerHTML = `
+              <p><strong>Latitude:</strong> ${currentLat.toFixed(6)}</p>
+              <p><strong>Longitude:</strong> ${currentLng.toFixed(6)}</p>
+              <p><strong>Akurasi:</strong> ${accuracy.toFixed(2)} meter</p>
+            `;
+            mapButton.classList.remove('hidden');
+          },
+          (error) => {
+            let errorMessage;
+            switch (error.code) {
+              case error.PERMISSION_DENIED:
+                errorMessage = 'Izin akses lokasi ditolak.';
+                break;
+              case error.POSITION_UNAVAILABLE:
+                errorMessage = 'Informasi lokasi tidak tersedia.';
+                break;
+              case error.TIMEOUT:
+                errorMessage = 'Permintaan lokasi timeout.';
+                break;
+              default:
+                errorMessage = 'Terjadi kesalahan: ' + error.message;
+            }
+            errorDiv.innerHTML = errorMessage;
+            errorDiv.classList.remove('hidden');
+            locationDiv.innerHTML = 'Gagal mendapatkan lokasi.';
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        );
+      } else {
+        errorDiv.innerHTML = 'Geolocation tidak didukung oleh browser ini.';
+        errorDiv.classList.remove('hidden');
+        locationDiv.innerHTML = 'Gagal mendapatkan lokasi.';
       }
-    );
-  } else {
-    console.error("Geolocation tidak didukung oleh browser ini.");
-    document.getElementById("location").innerHTML = 
-      "Geolocation tidak didukung oleh browser ini.";
-  }
-}
+    }
 
-function showOnMap(position) {
-    if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      // Callback sukses
-      (position) => {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
-        const mapUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
-        window.open(mapUrl, "_blank");
-    },
-      // Callback error
-      (error) => {
-        console.error("Error getting location for map:", error);
-        alert("Tidak dapat menampilkan lokasi di peta.");
+    function openMapModal() {
+      document.getElementById('mapModal').classList.remove('hidden');
+      initMap();
+    }
+
+    function closeMapModal() {
+      document.getElementById('mapModal').classList.add('hidden');
+      if (map) {
+        map.remove(); // Hapus peta untuk mencegah duplikasi
+        map = null;
       }
-    );
-  }
-}
-// Panggil fungsi saat halaman dimuat atau tombol diklik
-window.onload = getLocation;
+    }
+
+    function initMap() {
+      if (!currentLat || !currentLng) return;
+
+      map = L.map('map').setView([currentLat, currentLng], 15);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      marker = L.marker([currentLat, currentLng]).addTo(map)
+        .bindPopup('Lokasi Anda')
+        .openPopup();
+    }
