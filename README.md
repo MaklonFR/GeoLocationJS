@@ -47,7 +47,8 @@ Proyek ini adalah aplikasi web sederhana yang memungkinkan pengguna untuk mengam
 
 ## 📷 Screenshot
 
-![Screenshot aplikasi](https://via.placeholder.com/600x400.png?text=Contoh+Tampilan+UI)  
+![image](https://github.com/user-attachments/assets/ffda4f87-210b-464c-bfe1-dbe85565160d)
+
 <sup>Contoh tampilan aplikasi setelah mendapatkan lokasi dan membuka peta.</sup>
 
 ---
